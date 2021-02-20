@@ -8,9 +8,10 @@ namespace ULogView
 {
 	static class DropFile
 	{
-		public static void Initialize(Window mainWindow)
+		public static void Initialize(Window mainWindow, Action<string> onDropFile)
 		{
-			var windowHandle = new WindowInteropHelper(mainWindow).Handle;
+            DropFile.onDropFile = onDropFile;
+            var windowHandle = new WindowInteropHelper(mainWindow).Handle;
 			var webViewWindow = GetWindow(windowHandle, GetWindowType.GW_CHILD);
 			var chromeContainer = GetWindow(webViewWindow, GetWindowType.GW_CHILD);
 			var chrome = GetWindow(chromeContainer, GetWindowType.GW_CHILD);
@@ -19,7 +20,8 @@ namespace ULogView
 			RegisterDragDrop(chrome, dropTarget);
 		}
 
-        static DropTarget dropTarget = new DropTarget();
+        readonly static DropTarget dropTarget = new DropTarget();
+        static Action<string> onDropFile;
 
         class DropTarget : IDropTarget
         {
@@ -36,7 +38,7 @@ namespace ULogView
                 var zahl = DragQueryFile(med.data, -1, null, 0);
                 var sb = new StringBuilder(300);
                 DragQueryFile(med.data, 0, sb, sb.Capacity);
-                var watt = sb.ToString();
+                onDropFile(sb.ToString());
             }
 
             [DllImport("shell32.dll")]
