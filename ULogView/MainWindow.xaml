@@ -8,6 +8,6 @@
         Title="MainWindow" 
 		Loaded="Window_Loaded">
     <DockPanel>
-		<wv2:WebView2 Source="https://google.de" />
+		<wv2:WebView2 Source="http://localhost:3000/" />
 	</DockPanel>
 </Window>
