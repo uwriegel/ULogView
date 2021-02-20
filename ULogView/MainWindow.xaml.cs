@@ -13,5 +13,10 @@ namespace ULogView
 		{
 			LogServer.start();
 		}
+
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			LogServer.sendEvent("Das war es");
+		}
 	}
 }

@@ -5,9 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ULogView"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        mc:Ignorable="d"
+        d:DesignHeight="400" d:DesignWidth="300"		
         Title="MainWindow" 
 		Loaded="Window_Loaded">
     <DockPanel>
+		<Button DockPanel.Dock="Top" Click="Button_Click">Knopf</Button>
 		<wv2:WebView2 Source="http://localhost:3000/" />
 	</DockPanel>
 </Window>

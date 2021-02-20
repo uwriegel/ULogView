@@ -1,6 +1,10 @@
 import React from 'react'
 import './App.css'
 
+const ws = new WebSocket("ws://localhost:9865/websocketurl")
+ws.onclose = () => console.log("Closed")
+ws.onmessage = p => console.log(JSON.parse(p.data))
+ 
 function App() {
 
 	const onclick = async () =>{
