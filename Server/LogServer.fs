@@ -79,5 +79,9 @@ let sendEvent msg =
     | Some send -> send msg
     | None -> ()
 
-let indexFile file =
-    ()
+let indexFile logFile =
+    // TODO Send Loading...
+    let lines = LogFile.readLog logFile true
+    sessionIdGenerator <- sessionIdGenerator + 1
+    logSessions.[string sessionIdGenerator] <- lines 
+    // TODO Send Loading finished
