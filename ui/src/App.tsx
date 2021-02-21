@@ -1,5 +1,4 @@
 import React from 'react'
-import './App.css'
 import {LogView} from './LogView'
 
 const ws = new WebSocket("ws://localhost:9865/websocketurl")
