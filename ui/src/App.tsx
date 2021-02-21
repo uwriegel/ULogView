@@ -1,5 +1,6 @@
 import React from 'react'
 import './App.css'
+import {LogView} from './LogView'
 
 const ws = new WebSocket("ws://localhost:9865/websocketurl")
 ws.onclose = () => console.log("Closed")
@@ -16,12 +17,8 @@ function App() {
 
   	return (
     	<div className="App">
-      		<header className="App-header">
-				<p>
-					Edit <code>src/App.tsx</code> and save to reload.
-				</p>
-				<button onClick={onclick}>Abfrage</button>
-      		</header>
+			<button onClick={onclick}>Abfrage</button>
+			<LogView />
   		</div>
   	)
 }
