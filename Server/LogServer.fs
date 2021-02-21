@@ -1,10 +1,16 @@
 ﻿module LogServer
 
-open FSharpTools
+open System.Collections.Concurrent
 open System.IO
+
+open FSharpTools
 open Session
+open ULogViewServer
 
 let mutable private send: ((obj->unit) option) = None
+
+let mutable private sessionIdGenerator = 0
+let private logSessions = ConcurrentDictionary<string, LineItem[]>()
 
 let private onSocketSession (session: Types.Session) =
     let onReceive (payload: Stream) =
@@ -28,20 +34,30 @@ let request (requestSession: RequestSession) =
     async {
         let request = requestSession.Query.Value
         match requestSession.Query.Value.Request with
-        | "affen" ->
+        | "initialize" ->
             let test = requestSession.Query.Value
-            let param1 = test.Query "param1" 
-            let param2 = test.Query "param2"
-            let param3 = test.Query "param41"
-
-            let command = {
-                Cmd = "Command"
-                RequestId = "RequestIDValue"
-                Count= 45L
-            }
-            //System.Threading.Thread.Sleep 3
-            do! requestSession.AsyncSendJson (command :> obj)
-            return true
+            let logFile = test.Query "file" 
+            let isAnsi = test.Query "ansi" = Some "true"
+            match logFile with 
+            | Some logFile -> 
+                let lines = LogFile.readLog logFile isAnsi
+                sessionIdGenerator <- sessionIdGenerator + 1
+                logSessions.[string sessionIdGenerator] <- lines 
+                let command = {
+                    Cmd = "Command"
+                    RequestId = "RequestIDValue"
+                    Count= 45L
+                }
+                do! requestSession.AsyncSendJson (command :> obj)
+                return true
+            | None -> 
+                return false
+        | "getitem" ->
+            let test = requestSession.Query.Value
+            match test.Query "id", test.Query "index" with
+            | Some id, Some index ->
+                return false
+            | _ -> return false
         | _ -> return false
     }
 
@@ -62,3 +78,6 @@ let sendEvent msg =
     match send with
     | Some send -> send msg
     | None -> ()
+
+let indexFile file =
+    ()

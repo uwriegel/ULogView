@@ -12,4 +12,8 @@
     <PackageReference Include="UwebSocket" Version="4.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ULogViewServer\ULogViewServer.fsproj" />
+  </ItemGroup>
+
 </Project>

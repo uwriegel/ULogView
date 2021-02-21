@@ -10,9 +10,8 @@ namespace ULogView
 
         void Button_Click(object sender, RoutedEventArgs e) => LogServer.sendEvent("Das war es");
 
-        void OnDropFile(string file)
-        {
-        }
+        void OnDropFile(string file) =>
+            LogServer.indexFile(file);
 
         void webView_NavigationCompleted(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
             => DropFile.Initialize(this, OnDropFile);

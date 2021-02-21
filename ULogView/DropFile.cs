@@ -118,6 +118,7 @@ namespace ULogView
             TYMED_ENHMF = 64,
         }
 
+#pragma warning disable 649
         struct POINTL
         {
             [ComAliasName("Microsoft.VisualStudio.OLE.Interop.LONG")]
