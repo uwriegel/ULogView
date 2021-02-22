@@ -7,6 +7,7 @@ open System.Text
 open ULogViewServer
 
 let readLog filePath isUtf8 = 
+    Encoding.RegisterProvider CodePagesEncodingProvider.Instance |> ignore
     let encoding = if isUtf8 then Encoding.UTF8 else Encoding.GetEncoding (CultureInfo.CurrentCulture.TextInfo.ANSICodePage)
     let stream = new FileStream (filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite) 
     let reader = new StreamReader (stream, encoding)

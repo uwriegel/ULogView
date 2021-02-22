@@ -61,7 +61,7 @@ let start () = server.start ()
 
 let indexFile logFile =
     // TODO Send Loading...
-    let lines = LogFile.readLog logFile true
+    let lines = LogFile.readLog logFile false
     
     logSessions <- logSessions |> Map.map (fun k item  -> { item with Items = lines })
     logSessions |> Map.iter (fun key item -> item.Send ({ Id = key; LineCount = lines.Length } :> obj)) 

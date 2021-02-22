@@ -33,7 +33,7 @@ export const LogView = ({itemSource }: LogViewProps) => {
 
     const itemRenderer = (item: VirtualTableItem) => {
         const tableItem = item as LogViewItem
-        return [ <td key={1}>{tableItem.item}</td> ]
+        return [ <td className='textitem' key={1}>{tableItem.item}</td> ]
     }
 
     const onFocused = (val: boolean) => setFocused(val)
