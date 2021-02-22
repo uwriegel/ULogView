@@ -2,28 +2,28 @@
 
 open System.Collections.Concurrent
 open System.IO
+open System.Threading
 
 open FSharpTools
 open Session
 open ULogViewServer
 
-let mutable private send: ((obj->unit) option) = None
+type LogSession = {
+    Send: (obj->unit)
+    Items: LineItem[] 
+}
 
 let mutable private sessionIdGenerator = 0
-let private logSessions = ConcurrentDictionary<string, LineItem[]>()
+let private logSessions = ConcurrentDictionary<string, LogSession>()
 
 let private onSocketSession (session: Types.Session) =
-    let onReceive (payload: Stream) =
-        use tr = new StreamReader (payload)
-        ()
-
-    let onClose () = send <- None            
-
+    let onReceive (payload: Stream) = ()
+    let id = string (Interlocked.Increment &sessionIdGenerator)
+    let onClose () = logSessions.TryRemove(id) |> ignore 
     let sendBytes = session.Start onReceive onClose
-
     let sendObject = Json.serializeToBuffer >> sendBytes
-    send <- Some sendObject
-
+    logSessions.[id] <- { Send = sendObject; Items = [||]}
+    
 type Command = {
     Cmd: string
     RequestId: string
@@ -42,7 +42,7 @@ let request (requestSession: RequestSession) =
             | Some logFile -> 
                 let lines = LogFile.readLog logFile isAnsi
                 sessionIdGenerator <- sessionIdGenerator + 1
-                logSessions.[string sessionIdGenerator] <- lines 
+                //logSessions.[string sessionIdGenerator] <- lines 
                 let command = {
                     Cmd = "Command"
                     RequestId = "RequestIDValue"
@@ -74,14 +74,13 @@ let private server = Server.create configuration
 
 let start () = server.start ()    
 
-let sendEvent msg = 
-    match send with
-    | Some send -> send msg
-    | None -> ()
-
 let indexFile logFile =
     // TODO Send Loading...
     let lines = LogFile.readLog logFile true
-    sessionIdGenerator <- sessionIdGenerator + 1
-    logSessions.[string sessionIdGenerator] <- lines 
+    
+    for key in logSessions.Keys do
+        let session = logSessions.Item(key)    
+        let updatedSession = { session with Items = lines }
+        logSessions.TryUpdate(key, updatedSession, updatedSession) |> ignore
+        updatedSession.Send ({ Id = key; LineCount = lines.Length } :> obj)
     // TODO Send Loading finished

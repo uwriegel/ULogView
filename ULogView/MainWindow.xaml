@@ -10,7 +10,6 @@
         Title="MainWindow" 
 		Loaded="Window_Loaded">
     <DockPanel>
-		<Button DockPanel.Dock="Top" Click="Button_Click">Knopf</Button>
 		<wv2:WebView2 Name="webView" Source="http://localhost:3000" NavigationCompleted="webView_NavigationCompleted" />
 	</DockPanel>
 </Window>

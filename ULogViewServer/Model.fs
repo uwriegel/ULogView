@@ -12,5 +12,7 @@ type LineItem = {
     Index: int
     FileIndex: int
 }
-
-   
+type LogFileSession = {
+    Id: string
+    LineCount: int
+}
