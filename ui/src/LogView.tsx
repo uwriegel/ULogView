@@ -1,5 +1,14 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useLayoutEffect } from 'react'
 import 'virtual-table-react/dist/index.css'
+
+export interface LogViewItem extends VirtualTableItem {
+    item: string
+}
+
+export type ItemsSource = {
+    count: number
+    getItems: (start: number, end: number)=>Promise<LogViewItem[]>
+}
 
 import { 
     Column, 
@@ -9,69 +18,47 @@ import {
     VirtualTableItems
 } from 'virtual-table-react'
 
-interface TableItem extends VirtualTableItem {
-    col1: string
-    col2: string
-    col3: string
+export type LogViewProps = {
+    itemSource: ItemsSource
+
+
+    onChangeArray: () =>void
+
+
+
 }
 
-export const LogView = () => {
-    const [cols, setCols] = useState([
-        { name: "Eine Spalte", isSortable: true }, 
-        { name: "Zweite. Spalte" }, 
-        { name: "Letzte Spalte", isSortable: true }
-    ] as Column[])
-
-    const getTableItem = (i: number) => tableItems.current[i]
+export const LogView = ({itemSource, onChangeArray}: LogViewProps) => {
+    const [cols, setCols] = useState([{ name: "Eine Spalte" }] as Column[])
 
     const [focused, setFocused] = useState(false)
-    const [items, setItems ] = useState(setVirtualTableItems({count: 0, getItem: getTableItem, itemRenderer: i=>[]}) as VirtualTableItems)
+    const [items, setItems ] = useState(setVirtualTableItems({count: 0, getItems: async (s, e) =>[], itemRenderer: i=>[]}) as VirtualTableItems)
         
-    const tableItems = useRef([] as VirtualTableItem[])
-
     const onColsChanged = (cols: Column[])=> {}
     const onSort = ()=> {}
 
-    const getItem = (index: number) => ({ 
-        col1: `Name ${index}`, 
-        col2: `Adresse ${index}`, 
-        col3: `Größe ${index}`, 
-        index: index, 
-        isSelected: index == 4 || index == 7 || index == 8 } as TableItem)
-
-    const onChange = () => {
-        tableItems.current = Array.from(Array(20).keys()).map(index => getItem(index))
-        setItems(setVirtualTableItems({count: tableItems.current.length, getItem: getTableItem, itemRenderer}))
-    }
-    
-    const onChangeArray = () => {
-        tableItems.current = Array.from(Array(60).keys()).map(index => getItem(index))
-        setItems(setVirtualTableItems({count: tableItems.current.length, getItem: getTableItem, itemRenderer, currentIndex: 45}))
-    }
-    
     const itemRenderer = (item: VirtualTableItem) => {
-        const tableItem = item as TableItem
-        return [
-            <td key={1}>{tableItem.col1}</td>,
-            <td key={2}>{tableItem.col2}</td>,
-            <td key={3}>{tableItem.col3}</td>	
-	    ]
+        const tableItem = item as LogViewItem
+        return [ <td key={1}>{tableItem.item}</td> ]
     }
 
     const onSetFocus = () => setFocused(true)   
 
     const onFocused = (val: boolean) => setFocused(val)
 
+    useLayoutEffect(() => 
+        setItems(setVirtualTableItems({count: itemSource.count, getItems: itemSource.getItems, itemRenderer, currentIndex: 45}))
+    , [itemSource])
+
     return (
         <div className='rootVirtualTable'>
             <h1>Virtual Table</h1>
-            <button onClick={onChange}>Fill</button>
             <button onClick={onChangeArray}>Fill array</button>
             <button onClick={onSetFocus}>Set Focus</button>
             <div className='containerVirtualTable'>
                 <VirtualTable 
                     columns={cols} 
-                    //isColumnsHidden={true}
+                    isColumnsHidden={true}
                     onColumnsChanged={onColsChanged} 
                     onSort={onSort} 
                     items={items}
