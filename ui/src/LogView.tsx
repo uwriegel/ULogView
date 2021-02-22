@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react'
+import React, { useState, useLayoutEffect, useEffect } from 'react'
 import 'virtual-table-react/dist/index.css'
 
 export interface LogViewItem extends VirtualTableItem {
@@ -20,15 +20,9 @@ import {
 
 export type LogViewProps = {
     itemSource: ItemsSource
-
-
-    onChangeArray: () =>void
-
-
-
 }
 
-export const LogView = ({itemSource, onChangeArray}: LogViewProps) => {
+export const LogView = ({itemSource }: LogViewProps) => {
     const [cols, setCols] = useState([{ name: "Eine Spalte" }] as Column[])
 
     const [focused, setFocused] = useState(false)
@@ -42,30 +36,24 @@ export const LogView = ({itemSource, onChangeArray}: LogViewProps) => {
         return [ <td key={1}>{tableItem.item}</td> ]
     }
 
-    const onSetFocus = () => setFocused(true)   
-
     const onFocused = (val: boolean) => setFocused(val)
 
-    useLayoutEffect(() => 
-        setItems(setVirtualTableItems({count: itemSource.count, getItems: itemSource.getItems, itemRenderer, currentIndex: 45}))
-    , [itemSource])
+    useLayoutEffect(() => {
+        setItems(setVirtualTableItems({count: itemSource.count, getItems: itemSource.getItems, itemRenderer }))
+        setFocused(true)
+    }, [itemSource])
 
     return (
-        <div className='rootVirtualTable'>
-            <h1>Virtual Table</h1>
-            <button onClick={onChangeArray}>Fill array</button>
-            <button onClick={onSetFocus}>Set Focus</button>
-            <div className='containerVirtualTable'>
-                <VirtualTable 
-                    columns={cols} 
-                    isColumnsHidden={true}
-                    onColumnsChanged={onColsChanged} 
-                    onSort={onSort} 
-                    items={items}
-                    onItemsChanged ={setItems}
-                    focused={focused}
-                    onFocused={onFocused} />
-            </div>
+        <div className='containerVirtualTable'>
+            <VirtualTable 
+                columns={cols} 
+                isColumnsHidden={true}
+                onColumnsChanged={onColsChanged} 
+                onSort={onSort} 
+                items={items}
+                onItemsChanged ={setItems}
+                focused={focused}
+                onFocused={onFocused} />
         </div>
     )
 }

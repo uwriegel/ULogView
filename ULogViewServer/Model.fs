@@ -15,4 +15,4 @@ type LineItem = {
 type LogFileSession = {
     Id: string
     LineCount: int
-}
+}   

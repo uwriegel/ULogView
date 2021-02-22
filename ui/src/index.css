@@ -2,6 +2,8 @@ body {
 	height: 100vh;
 	margin: 0px;
 	padding: 0px;
+	font-family: sans-serif;
+    font-size: small;	
 	display: flex;
 }
 :root {  
@@ -89,7 +91,6 @@ body {
 }
 .containerVirtualTable {
     flex-grow: 1;
-    padding: 20px;
     display: flex;
 }
 .tabletest {

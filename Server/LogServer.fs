@@ -14,15 +14,15 @@ type LogSession = {
 }
 
 let mutable private sessionIdGenerator = 0
-let private logSessions = ConcurrentDictionary<string, LogSession>()
+let mutable logSessions = Map.empty<string, LogSession>
 
 let private onSocketSession (session: Types.Session) =
     let onReceive (payload: Stream) = ()
     let id = string (Interlocked.Increment &sessionIdGenerator)
-    let onClose () = logSessions.TryRemove(id) |> ignore 
+    let onClose () = logSessions <- logSessions.Remove id 
     let sendBytes = session.Start onReceive onClose
     let sendObject = Json.serializeToBuffer >> sendBytes
-    logSessions.[id] <- { Send = sendObject; Items = [||]}
+    logSessions <- logSessions.Add (id, { Send = sendObject; Items = [||]})
     
 type Command = {
     Cmd: string
@@ -34,29 +34,14 @@ let request (requestSession: RequestSession) =
     async {
         let request = requestSession.Query.Value
         match requestSession.Query.Value.Request with
-        | "initialize" ->
+        | "getitems" ->
             let test = requestSession.Query.Value
-            let logFile = test.Query "file" 
-            let isAnsi = test.Query "ansi" = Some "true"
-            match logFile with 
-            | Some logFile -> 
-                let lines = LogFile.readLog logFile isAnsi
-                sessionIdGenerator <- sessionIdGenerator + 1
-                //logSessions.[string sessionIdGenerator] <- lines 
-                let command = {
-                    Cmd = "Command"
-                    RequestId = "RequestIDValue"
-                    Count= 45L
-                }
-                do! requestSession.AsyncSendJson (command :> obj)
+            match test.Query "id", test.Query "start", test.Query "end" with
+            | Some id, Some startIndex, Some endIndex ->
+                let session = logSessions.Item(id)
+                let result = session.Items.[int startIndex..int endIndex]
+                do! requestSession.AsyncSendJson (result :> obj)
                 return true
-            | None -> 
-                return false
-        | "getitem" ->
-            let test = requestSession.Query.Value
-            match test.Query "id", test.Query "index" with
-            | Some id, Some index ->
-                return false
             | _ -> return false
         | _ -> return false
     }
@@ -78,9 +63,6 @@ let indexFile logFile =
     // TODO Send Loading...
     let lines = LogFile.readLog logFile true
     
-    for key in logSessions.Keys do
-        let session = logSessions.Item(key)    
-        let updatedSession = { session with Items = lines }
-        logSessions.TryUpdate(key, updatedSession, updatedSession) |> ignore
-        updatedSession.Send ({ Id = key; LineCount = lines.Length } :> obj)
+    logSessions <- logSessions |> Map.map (fun k item  -> { item with Items = lines })
+    logSessions |> Map.iter (fun key item -> item.Send ({ Id = key; LineCount = lines.Length } :> obj)) 
     // TODO Send Loading finished

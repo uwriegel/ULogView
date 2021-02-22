@@ -1,51 +1,43 @@
-import React, { useState, useEffect,
-
-
-
-useRef
-
-
-} from 'react'
-import { setVirtualTableItems, VirtualTableItem, VirtualTableItems } from 'virtual-table-react'
+import React, { useState, useEffect, useRef } from 'react'
 import {ItemsSource, LogView, LogViewItem} from './LogView'
+
+type LogFileItem = {
+	id: string
+	lineCount: number
+}
+
+type LineItem = {
+    text: string
+    index?: number
+    fileIndex: number
+}
 
 function App() {
 	const [itemSource, setItemSource] = useState({count: 0, getItems: async (s,e)=>[]} as ItemsSource)
 
-    const getItem = (index: number) => ({ 
-        item: `Name ${index}`, 
-        index: index 
+    const getItem = (text: string, index?: number) => ({ 
+        item: text, 
+        index: index || 0 
     } as LogViewItem)
 
-    const getItems = (start: number, end: number) => 
-        new Promise<LogViewItem[]>(res => setTimeout(() => 
-            res(Array.from(Array(end - start + 1).keys()).map(i => getItem(i + start))), 30))
-
-
-
-	const tableItems = useRef([] as VirtualTableItem[])
-	const onChangeArray = () => {
-		tableItems.current = Array.from(Array(60).keys()).map(index => getItem(index))
-		setItemSource({count: tableItems.current.length, getItems})
+    const getItems = async (id: string, start: number, end: number) => {
+		const data = await fetch(`http://localhost:9865/getitems?id=${id}&start=${start}&end=${end}`)
+		const lineItems = (await data.json() as LineItem[])
+		return lineItems.map(n => getItem(n.text, n.fileIndex))
 	}
 	
-	const onclick = async () =>{
-		var data = await fetch("http://localhost:9865/affen")
-		console.log("data", data)
-		const json = await data.json()
-		console.log("data json", json)
-	}
-
 	useEffect(() => {
 		const ws = new WebSocket("ws://localhost:9865/websocketurl")
 		ws.onclose = () => console.log("Closed")
-		ws.onmessage = p => console.log(JSON.parse(p.data))
+		ws.onmessage = p => { 
+			const logFileItem = JSON.parse(p.data) as LogFileItem
+			setItemSource({count: logFileItem.lineCount, getItems: (s, e) => getItems(logFileItem.id, s, e) })
+		}
 	}, [])
 
   	return (
     	<div className="App">
-			<button onClick={onclick}>Abfrage</button>
-			<LogView itemSource={itemSource} onChangeArray={onChangeArray}/>
+			<LogView itemSource={itemSource} />
   		</div>
   	)
 }
