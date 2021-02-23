@@ -47,64 +47,10 @@ body {
     flex-direction: column;
 }
 
-.is-sortable {
-	background-color: yellow;
-	transition: background-color 0.3s; 
-}
-.isSortable:hover {
-	background-color: var(--tablereact-selected-background-hover-color);
-}
-
-.container {
-	margin: 0px 55px;
-}
-
-.img {
-	width:16px;
-}
-
-.main {
-	height: 100vh;
-	display: flex;
-	flex-direction: column;
-}
-.listcontainer {
-	margin: 20px;
-	position: relative;
-	flex-grow: 1;
-	overflow: hidden;
-
-	border-color: gray;
-	border-style: solid;
-	border-width: 1px;
-}
-.list {
-	position: absolute;
-	height: 100%;
-	width: 100%;        
-}
-.rootVirtualTable {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    background-color: #444;
-}
 .containerVirtualTable {
     flex-grow: 1;
+	flex-direction: column;
     display: flex;
-}
-.tabletest {
-	width: 100%;
-	box-sizing: border-box;
-	outline-width: 0px;
-	table-layout: fixed;
-	border-spacing: 0px;
-}
-.tabletest td {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	user-select: none;
 }
 
 table tr .textitem {

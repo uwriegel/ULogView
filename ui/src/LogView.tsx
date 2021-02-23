@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useEffect } from 'react'
+import React, { useState, useLayoutEffect, useRef } from 'react'
 import 'virtual-table-react/dist/index.css'
 
 export interface LogViewItem extends VirtualTableItem {
@@ -27,13 +27,19 @@ export const LogView = ({itemSource }: LogViewProps) => {
 
     const [focused, setFocused] = useState(false)
     const [items, setItems ] = useState(setVirtualTableItems({count: 0, getItems: async (s, e) =>[], itemRenderer: i=>[]}) as VirtualTableItems)
+
+    const input = useRef("")
         
     const onColsChanged = (cols: Column[])=> {}
     const onSort = ()=> {}
 
+    const selectItems = () => {
+        return 'textitem'
+    }
+
     const itemRenderer = (item: VirtualTableItem) => {
         const tableItem = item as LogViewItem
-        return [ <td className='textitem' key={1}>{tableItem.item}</td> ]
+        return [ <td className={selectItems()} key={1}>{tableItem.item}</td> ]
     }
 
     const onFocused = (val: boolean) => setFocused(val)
@@ -43,8 +49,20 @@ export const LogView = ({itemSource }: LogViewProps) => {
         setFocused(true)
     }, [itemSource])
 
+    const onRestrictionsChanged = (evt: React.ChangeEvent<HTMLInputElement>) => {
+        input.current = evt.target.value
+    }
+
+    const onKeydown = (sevt: React.KeyboardEvent) => {
+        const evt = sevt.nativeEvent
+        if (evt.which == 13) { // Enter
+            console.log(input.current)
+            setFocused(true)
+        }
+    }
+
     return (
-        <div className='containerVirtualTable'>
+        <div className='containerVirtualTable' onKeyDown={onKeydown}>
             <VirtualTable 
                 columns={cols} 
                 isColumnsHidden={true}
@@ -54,6 +72,7 @@ export const LogView = ({itemSource }: LogViewProps) => {
                 onItemsChanged ={setItems}
                 focused={focused}
                 onFocused={onFocused} />
+            <input type="text" onChange={onRestrictionsChanged} />
         </div>
     )
 }
