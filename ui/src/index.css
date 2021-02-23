@@ -56,3 +56,22 @@ body {
 table tr .textitem {
 	user-select: text;
 }
+
+.highlight1 {
+	color: white;
+	background-color: #0063ff;
+}
+
+.highlight2 {
+	background-color: yellow;
+}
+
+.highlight3 {
+	color: white;
+	background-color: red;
+}
+
+.highlight3 {
+	color: white;
+	background-color: green;
+}
