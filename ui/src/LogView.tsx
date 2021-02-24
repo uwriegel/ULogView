@@ -17,18 +17,19 @@ import {
     setVirtualTableItems,
     VirtualTableItems
 } from 'virtual-table-react'
+
 import { TextItem } from './TextItem'
 
 export type LogViewProps = {
+    id: string
     itemSource: ItemsSource
 }
 
-export const LogView = ({itemSource }: LogViewProps) => {
+export const LogView = ({id, itemSource }: LogViewProps) => {
     const [cols, setCols] = useState([{ name: "Eine Spalte" }] as Column[])
 
     const [focused, setFocused] = useState(false)
     const [items, setItems ] = useState(setVirtualTableItems({count: 0, getItems: async (s, e) =>[]}) as VirtualTableItems)
-    const [restrictions, setRestrictions] = useState([] as string[])
 
     const input = useRef("")
         
@@ -42,25 +43,20 @@ export const LogView = ({itemSource }: LogViewProps) => {
         setFocused(true)
     }, [itemSource])
 
-    useEffect(() => {}, [restrictions])
-
     const onRestrictionsChanged = (evt: React.ChangeEvent<HTMLInputElement>) => {
         input.current = evt.target.value
     }
 
-    const onKeydown = (sevt: React.KeyboardEvent) => {
+    const onKeydown = async (sevt: React.KeyboardEvent) => {
         const evt = sevt.nativeEvent
         if (evt.which == 13) { // Enter
-            const restrictions = 
-                input.current   
-                ? input.current.split(" OR ").map(n => n.split(" && ")).flat()
-                : []
-            setRestrictions(restrictions)
+            const data = await fetch(`http://localhost:9865/setrestrictions?id=${id}&restriction=${input.current}`)
+            const affen = await data.json()
             setFocused(true)
         }
     }
 
-    const itemRenderer = (item: VirtualTableItem) => [ <TextItem item={item as LogViewItem} restrictions={restrictions} /> ]
+    const itemRenderer = (item: VirtualTableItem) => [ <TextItem item={item as LogViewItem} /> ]
 
     return (
         <div className='containerVirtualTable' onKeyDown={onKeydown}>

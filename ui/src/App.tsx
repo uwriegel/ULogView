@@ -14,6 +14,7 @@ type LineItem = {
 
 function App() {
 	const [itemSource, setItemSource] = useState({count: 0, getItems: async (s,e)=>[]} as ItemsSource)
+	const [id, setId] = useState("")
 
     const getItem = (text: string, index?: number) => ({ 
         item: text, 
@@ -31,13 +32,14 @@ function App() {
 		ws.onclose = () => console.log("Closed")
 		ws.onmessage = p => { 
 			const logFileItem = JSON.parse(p.data) as LogFileItem
+			setId(logFileItem.id)
 			setItemSource({count: logFileItem.lineCount, getItems: (s, e) => getItems(logFileItem.id, s, e) })
 		}
 	}, [])
 
   	return (
     	<div className="App">
-			<LogView itemSource={itemSource} />
+			<LogView itemSource={itemSource} id={id} />
   		</div>
   	)
 }

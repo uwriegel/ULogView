@@ -52,8 +52,11 @@ let request (requestSession: RequestSession) =
         | "setrestrictions" ->
             match request.Query "id", request.Query "restriction" with
             | Some id, Some restriction -> 
-
-                return false
+                let session = logSessions.Item(id)
+                let restriction = Restriction.getRestriction restriction
+                logSessions <- logSessions |> Map.map (fun k item  -> { item with Restriction = Some restriction })
+                do! requestSession.AsyncSendJson (restriction :> obj)
+                return true
             | _ -> return false
         | _ -> return false
     }
