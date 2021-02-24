@@ -27,10 +27,10 @@ let test7 = getHighlightedPartsFromParts "cache"  test6 RestrictionIndex.Restric
 
 
 
-let restrictionString0 = "Das ist OR Julias && Peter OR Hans && UTE OR nix" 
+let restrictionString0 = "Das ist OR Julias AND Peter OR Hans AND UTE OR nix" 
 let restriction0  = restrictionString0 |> Restriction.getRestriction
 
-let restrictionString = "user && cache OR info" 
+let restrictionString = "user AND cache OR info" 
 let restriction  = restrictionString |> Restriction.getRestriction
 
 

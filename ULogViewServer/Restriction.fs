@@ -8,14 +8,14 @@ open ULogViewServer
 
 let getRestriction restrictionString = 
     let getAndRestriction andPart = 
-        match andPart |> String.split " && " with
+        match andPart |> String.split " AND " with
         | andParts when andParts.Length > 1
             -> AndRestrictions (andParts |> Array.map (fun p -> Text p))
         | andPart when andPart.Length = 1
             -> Text andPart.[0]
         | _ -> Text ""
 
-    let getKeywords = String.splitMulti [|" OR "; " && "|]
+    let getKeywords = String.splitMulti [|" OR "; " AND "|]
     
     {
         Restrictions = 
