@@ -102,7 +102,20 @@ let id = createSessionId ()
 createSession id (fun a -> ()) 
 @"C:\Users\urieg\Desktop\CaesarProxy.log" |> indexFile
 let session = logSessions.Item(id)
-let result = session.Items.[..30]
+let result = session.Items.[140..170]
+
+
+
+
+let texte () = 
+    result
+    |> Array.map (fun n -> getRestrictionsParts restrictionKeys n.Text)
+
+let affen = texte ()
+
+let texte2 = 
+    result
+    |> Array.Parallel.map (fun n -> getRestrictionsParts restrictionKeys n.Text)
 
 
 //let getTextparts restrictionKeys text =
