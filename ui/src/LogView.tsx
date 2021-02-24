@@ -70,7 +70,7 @@ export const LogView = ({itemSource }: LogViewProps) => {
                 onColumnsChanged={onColsChanged} 
                 onSort={onSort} 
                 items={items}
-                onItemsChanged ={setItems}
+                onItemsChanged={setItems}
                 itemRenderer={itemRenderer}
                 focused={focused}
                 onFocused={onFocused} />

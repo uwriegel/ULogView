@@ -45,7 +45,7 @@ let request (requestSession: RequestSession) =
             match request.Query "id", request.Query "start", request.Query "end" with
             | Some id, Some startIndex, Some endIndex ->
                 let session = logSessions.Item(id)
-                let result = session.Items.[int startIndex..int endIndex]
+                let result = session.Items.[int startIndex..int endIndex] 
                 do! requestSession.AsyncSendJson (result :> obj)
                 return true
             | _ -> return false

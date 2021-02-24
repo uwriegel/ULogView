@@ -5,13 +5,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="String.fs" />
 		<Compile Include="Model.fs" />
+		<Compile Include="Restriction.fs" />
 		<Compile Include="LogFile.fs" />
 		<None Include="..\LICENSE">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
 	
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="FSharpTools" Version="4.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

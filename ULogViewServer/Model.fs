@@ -7,10 +7,15 @@ type LineItemIndex = {
     Item: string
 }
 
-type Restriction = 
-    | OrRestriction of Restriction[]
-    | AndRestriction of Restriction[]
+type Restrictions = 
+    | OrRestrictions of Restrictions[]
+    | AndRestrictions of Restrictions[]
     | Text of string
+
+type Restriction = {
+    Restrictions: Restrictions
+    Keywords: string list
+}
 
 type RestrictionIndex = 
     NotRestricted = 0
