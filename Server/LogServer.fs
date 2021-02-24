@@ -52,14 +52,24 @@ let request (requestSession: RequestSession) =
         | "setrestrictions" ->
             match request.Query "id", request.Query "restriction" with
             | Some id, Some restriction when restriction.Length > 0 -> 
+
                 let restriction = Restriction.getRestriction restriction
-                // TODO only session with this id
-                logSessions <- logSessions |> Map.map (fun k item  -> { item with Restriction = Some restriction })
+
+                let changeItem item = 
+                    match item with
+                    | Some item -> Some { item with Restriction = Some restriction }
+                    | None -> None
+
+                logSessions <- logSessions |> Map.change id changeItem
                 do! requestSession.AsyncSendJson ({||} :> obj)
                 return true
             | Some id, Some restriction when restriction.Length = 0 -> 
-                // TODO only session with this id
-                logSessions <- logSessions |> Map.map (fun k item  -> { item with Restriction = None })
+                let changeItem item = 
+                    match item with
+                    | Some item -> Some { item with Restriction = None }
+                    | None -> None
+
+                logSessions <- logSessions |> Map.change id changeItem
                 do! requestSession.AsyncSendJson ({||} :> obj)
                 return true
             | _ -> return false
