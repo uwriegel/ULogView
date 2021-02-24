@@ -29,17 +29,13 @@ type TextPart = {
     RestrictionIndex: RestrictionIndex
 }
 
-type LogItem = {
-    TextParts: TextPart[]
-    Index: int
-    FileIndex: int
-}
-
 type LineItem = {
+    HighlightedText: TextPart[] 
     Text: string
     Index: int
     FileIndex: int
 }
+
 type LogFileSession = {
     Id: string
     LineCount: int

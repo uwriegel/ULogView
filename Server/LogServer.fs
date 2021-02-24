@@ -1,10 +1,10 @@
 ﻿module LogServer
 
-open System.Collections.Concurrent
 open System.IO
 open System.Threading
 
 open FSharpTools
+open Restriction
 open Session
 open ULogViewServer
 
@@ -46,6 +46,11 @@ let request (requestSession: RequestSession) =
             | Some id, Some startIndex, Some endIndex ->
                 let session = logSessions.Item(id)
                 let result = session.Items.[int startIndex..int endIndex] 
+                let result = 
+                    match session.Restriction with 
+                    | Some restriction -> 
+                        result |> Array.map (fun item -> { item with HighlightedText = getHighlightedParts restriction.Keywords item.Text |> List.toArray })
+                    | None -> result
                 do! requestSession.AsyncSendJson (result :> obj)
                 return true
             | _ -> return false

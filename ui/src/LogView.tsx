@@ -38,8 +38,10 @@ export const LogView = ({id, itemSource }: LogViewProps) => {
 
     const onFocused = (val: boolean) => setFocused(val)
 
+    const refresh = () => setItems(setVirtualTableItems({count: itemSource.count, getItems: itemSource.getItems }))
+
     useLayoutEffect(() => {
-        setItems(setVirtualTableItems({count: itemSource.count, getItems: itemSource.getItems }))
+        refresh()
         setFocused(true)
     }, [itemSource])
 
@@ -50,8 +52,9 @@ export const LogView = ({id, itemSource }: LogViewProps) => {
     const onKeydown = async (sevt: React.KeyboardEvent) => {
         const evt = sevt.nativeEvent
         if (evt.which == 13) { // Enter
-            const data = await fetch(`http://localhost:9865/setrestrictions?id=${id}&restriction=${encodeURI(input.current)}`)
-            const affen = await data.json()
+            const data = await fetch(`http://localhost:9865/setrestrictions?id=${id}&restriction=${input.current}`)
+            await data.json()
+            refresh()
             setFocused(true)
         }
     }
