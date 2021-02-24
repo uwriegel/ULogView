@@ -10,19 +10,25 @@ open ULogViewServer
 
 type LogSession = {
     Send: (obj->unit)
-    Items: LineItem[] 
+    Items: LineItem[]
+    Restriction: Restriction option
 }
 
 let mutable private sessionIdGenerator = 0
 let mutable logSessions = Map.empty<string, LogSession>
 
+let createSession id send =
+    logSessions <- logSessions.Add (id, { Send = send; Items = [||]; Restriction = None})
+
+let createSessionId () = string (Interlocked.Increment &sessionIdGenerator)
+
 let private onSocketSession (session: Types.Session) =
     let onReceive (payload: Stream) = ()
-    let id = string (Interlocked.Increment &sessionIdGenerator)
+    let id = createSessionId ()
     let onClose () = logSessions <- logSessions.Remove id 
     let sendBytes = session.Start onReceive onClose
     let sendObject = Json.serializeToBuffer >> sendBytes
-    logSessions <- logSessions.Add (id, { Send = sendObject; Items = [||]})
+    createSession id sendObject
     
 type Command = {
     Cmd: string
@@ -31,17 +37,23 @@ type Command = {
 }
 
 let request (requestSession: RequestSession) =
+
     async {
         let request = requestSession.Query.Value
         match requestSession.Query.Value.Request with
         | "getitems" ->
-            let test = requestSession.Query.Value
-            match test.Query "id", test.Query "start", test.Query "end" with
+            match request.Query "id", request.Query "start", request.Query "end" with
             | Some id, Some startIndex, Some endIndex ->
                 let session = logSessions.Item(id)
                 let result = session.Items.[int startIndex..int endIndex]
                 do! requestSession.AsyncSendJson (result :> obj)
                 return true
+            | _ -> return false
+        | "setrestrictions" ->
+            match request.Query "id", request.Query "restriction" with
+            | Some id, Some restriction -> 
+
+                return false
             | _ -> return false
         | _ -> return false
     }
@@ -66,3 +78,7 @@ let indexFile logFile =
     logSessions <- logSessions |> Map.map (fun k item  -> { item with Items = lines })
     logSessions |> Map.iter (fun key item -> item.Send ({ Id = key; LineCount = lines.Length } :> obj)) 
     // TODO Send Loading finished
+
+
+
+

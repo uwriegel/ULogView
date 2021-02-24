@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ULogView", "ULogView\ULogVi
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Server", "Server\Server.fsproj", "{AAD1FC1D-CD47-4779-9D9E-038FFCBE63EE}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ULogViewServer", "ULogViewServer\ULogViewServer.fsproj", "{79083FB4-B2CE-49CB-8C46-DA4D76E7A218}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "ULogViewServer", "ULogViewServer\ULogViewServer.fsproj", "{79083FB4-B2CE-49CB-8C46-DA4D76E7A218}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Test", "Test\Test.fsproj", "{3E5E6D70-AB03-4B34-927B-59336388D1FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{79083FB4-B2CE-49CB-8C46-DA4D76E7A218}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79083FB4-B2CE-49CB-8C46-DA4D76E7A218}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79083FB4-B2CE-49CB-8C46-DA4D76E7A218}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E5E6D70-AB03-4B34-927B-59336388D1FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E5E6D70-AB03-4B34-927B-59336388D1FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E5E6D70-AB03-4B34-927B-59336388D1FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E5E6D70-AB03-4B34-927B-59336388D1FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
