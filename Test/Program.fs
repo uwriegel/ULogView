@@ -6,7 +6,7 @@ open System
 
 let test = "Hallo Info und USER und cache dsdkajdk info jakjd alk cachett"
 
-let getParts restrictionKey text restrictionIndex =
+let getTextParts restrictionKey text restrictionIndex =
     let rec restrict text =
         match text |> String.indexOfCompare restrictionKey StringComparison.CurrentCultureIgnoreCase with
         | Some index when index = 0 -> 
@@ -22,13 +22,47 @@ let getParts restrictionKey text restrictionIndex =
             let res = { Text = text.[index..index + restrictionKey.Length - 1]; RestrictionIndex = restrictionIndex } 
             first :: [ res ] @ restrict text.[index + restrictionKey.Length..]
     restrict text
-        
-let test1 = getParts "User" test RestrictionIndex.Restricted1
-let test2 = getParts "cache" test RestrictionIndex.Restricted1
 
-let test3 = getParts "User" "user ksdjfkdsj" RestrictionIndex.Restricted3
-let test4 = getParts "User" "dfd user ksduserjfkdsj" RestrictionIndex.Restricted3
-let test5 = getParts "User" "dfd user ksduserjfkdsj user" RestrictionIndex.Restricted3
+let test1 = getTextParts "User" test RestrictionIndex.Restricted1
+let test2 = getTextParts "cache" test RestrictionIndex.Restricted1
+
+let test3 = getTextParts "User" "user ksdjfkdsj" RestrictionIndex.Restricted3
+let test4 = getTextParts "User" "dfd user ksduserjfkdsj" RestrictionIndex.Restricted3
+let test5 = getTextParts "User" "dfd user ksduserjfkdsj user" RestrictionIndex.Restricted3
+
+let rec getParts restrictionKey parts restrictionIndex =
+    match parts with
+    | head :: tail when head.RestrictionIndex = RestrictionIndex.NotRestricted ->
+        let parts = getTextParts restrictionKey head.Text restrictionIndex
+        parts @ getParts restrictionKey tail restrictionIndex
+    | head :: tail when head.RestrictionIndex <> RestrictionIndex.NotRestricted ->
+        head :: getParts restrictionKey tail restrictionIndex
+    | [] -> []
+    | _ -> []
+
+let test6 = getParts "User" [{ Text = test
+                               RestrictionIndex = RestrictionIndex.NotRestricted 
+                            }] RestrictionIndex.Restricted1
+
+let test7 = getParts "cache"  test6 RestrictionIndex.Restricted2
+
+let getRestrictionsParts restrictionKeys text =
+    let rec getRestrictionsParts restrictionKeys parts index =
+
+        let nextIndex index = 
+            match index with
+            | RestrictionIndex.Restricted1 -> RestrictionIndex.Restricted2
+            | RestrictionIndex.Restricted2 -> RestrictionIndex.Restricted3
+            | _ -> RestrictionIndex.Restricted4
+
+        match restrictionKeys with
+        | head :: tail -> 
+            let parts = getParts head parts index
+            getRestrictionsParts tail parts (nextIndex index)
+        | [] -> parts
+    getRestrictionsParts restrictionKeys [{ Text = text
+                                            RestrictionIndex = RestrictionIndex.NotRestricted 
+                                         }] RestrictionIndex.Restricted1
 
 
 let getRestriction text = 
@@ -47,16 +81,22 @@ let getRestriction text =
         -> Text orPart.[0]
     | _ -> Text ""
 
-
 let getKeywords = String.splitMulti [|" OR "; " && "|]
-
 let restrictionString0 = "Das ist OR Julias && Peter OR Hans && UTE OR nix" 
 let restriction0  = restrictionString0 |> getRestriction
 let restrictionsKeys0 = restrictionString0 |> getKeywords    
 
-let restrictionString = "info OR user && cache" 
+let restrictionString = "user && cache OR info" 
 let restriction  = restrictionString |> getRestriction
-let restrictionKeys = restrictionString |> getKeywords    
+let restrictionKeys = restrictionString |> getKeywords |> Array.toList   
+
+
+let test8 = getRestrictionsParts restrictionKeys test
+
+
+
+
+
 
 let id = createSessionId ()
 createSession id (fun a -> ()) 
