@@ -60,7 +60,9 @@ export const TextItem = ({item }: TextItemProps) => {
     // return restrictions.length == 0
     //     ?  <td className='textitem' key={1}>{item.item}</td> 
     //     :  renderRestricted()
-    return <td className='textitem' key={1}>{item.item}</td> 
+    return item.highlightedItems
+        ? <td className='textitem' key={1}>{item.highlightedItems[0].text}</td> 
+        : <td className='textitem' key={1}>{item.item}</td> 
 }
 
 

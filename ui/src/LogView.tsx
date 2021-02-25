@@ -2,7 +2,8 @@ import React, { useState, useLayoutEffect, useRef, useEffect } from 'react'
 import 'virtual-table-react/dist/index.css'
 
 export interface LogViewItem extends VirtualTableItem {
-    item: string
+    item: string,
+    highlightedItems?: TextPart[] 
 }
 
 export type ItemsSource = {
@@ -19,6 +20,7 @@ import {
 } from 'virtual-table-react'
 
 import { TextItem } from './TextItem'
+import { TextPart } from './App'
 
 export type LogViewProps = {
     id: string

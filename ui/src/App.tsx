@@ -8,7 +8,13 @@ type LogFileItem = {
 	lineCount: number
 }
 
+export type TextPart = {
+    text: string
+    restrictionIndex: number
+}
+
 type LogItem = {
+	highlightedText?: TextPart[] 
     text: string
     index?: number
     fileIndex: number
@@ -23,8 +29,9 @@ function App() {
 	const [itemSource, setItemSource] = useState({count: 0, getItems: async (s,e)=>null} as ItemsSource)
 	const [id, setId] = useState("")
 
-    const getItem = (text: string, index?: number) => ({ 
+    const getItem = (text: string, highlightedItems?: TextPart[], index?: number) => ({ 
         item: text, 
+		highlightedItems,
         index: index || 0 
     } as LogViewItem)
 
@@ -32,7 +39,7 @@ function App() {
 		const data = await fetch(`http://localhost:9865/getitems?id=${id}&req=${++requestId}&start=${start}&end=${end}`)
 		const lineItems = (await data.json() as LogItemResult)
 		return requestId == lineItems.request
-			? lineItems.items.map(n => getItem(n.text, n.fileIndex))
+			? lineItems.items.map(n => getItem(n.text, n.highlightedText, n.fileIndex))
 			: null
 	}
 	
