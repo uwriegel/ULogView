@@ -40,7 +40,7 @@ export const LogView = ({id, itemSource }: LogViewProps) => {
 
     const onFocused = (val: boolean) => setFocused(val)
 
-    const refresh = () => setItems(setVirtualTableItems({count: itemSource.count, getItems: itemSource.getItems }))
+    const refresh = () => setItems(setVirtualTableItems({count: itemSource.count, getItems: itemSource.getItems, currentIndex: items.currentIndex }))
 
     useLayoutEffect(() => {
         refresh()
