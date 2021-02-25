@@ -1,19 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react'
 import {ItemsSource, LogView, LogViewItem} from './LogView'
 
+var requestId = 0
+
 type LogFileItem = {
 	id: string
 	lineCount: number
 }
 
-type LineItem = {
+type LogItem = {
     text: string
     index?: number
     fileIndex: number
 }
 
+type LogItemResult = {
+	request: number
+	items: LogItem[]
+}
+
 function App() {
-	const [itemSource, setItemSource] = useState({count: 0, getItems: async (s,e)=>[]} as ItemsSource)
+	const [itemSource, setItemSource] = useState({count: 0, getItems: async (s,e)=>null} as ItemsSource)
 	const [id, setId] = useState("")
 
     const getItem = (text: string, index?: number) => ({ 
@@ -22,9 +29,11 @@ function App() {
     } as LogViewItem)
 
     const getItems = async (id: string, start: number, end: number) => {
-		const data = await fetch(`http://localhost:9865/getitems?id=${id}&start=${start}&end=${end}`)
-		const lineItems = (await data.json() as LineItem[])
-		return lineItems.map(n => getItem(n.text, n.fileIndex))
+		const data = await fetch(`http://localhost:9865/getitems?id=${id}&req=${++requestId}&start=${start}&end=${end}`)
+		const lineItems = (await data.json() as LogItemResult)
+		return requestId == lineItems.request
+			? lineItems.items.map(n => getItem(n.text, n.fileIndex))
+			: null
 	}
 	
 	useEffect(() => {

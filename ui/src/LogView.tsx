@@ -7,7 +7,7 @@ export interface LogViewItem extends VirtualTableItem {
 
 export type ItemsSource = {
     count: number
-    getItems: (start: number, end: number)=>Promise<LogViewItem[]>
+    getItems: (start: number, end: number)=>Promise<LogViewItem[]|null>
 }
 
 import { 

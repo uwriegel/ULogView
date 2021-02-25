@@ -18,7 +18,7 @@ let mutable private sessionIdGenerator = 0
 let mutable logSessions = Map.empty<string, LogSession>
 
 let createSession id send =
-    logSessions <- logSessions.Add (id, { Send = send; Items = [||]; Restriction = None})
+    logSessions <- logSessions.Add (id, { Send = send; Items = [||]; Restriction = None })
 
 let createSessionId () = string (Interlocked.Increment &sessionIdGenerator)
 
@@ -36,45 +36,53 @@ type Command = {
     Count: int64
 }
 
+let updateSession id getUpdate = 
+    let changeItem maybeItem = 
+        match maybeItem with
+        | Some item -> Some (getUpdate item) //  { item with Restriction = None }
+        | None -> None
+    logSessions <- logSessions |> Map.change id changeItem
+
 let request (requestSession: RequestSession) =
 
     async {
         let request = requestSession.Query.Value
         match requestSession.Query.Value.Request with
         | "getitems" ->
-            match request.Query "id", request.Query "start", request.Query "end" with
-            | Some id, Some startIndex, Some endIndex ->
+            match request.Query "id", request.Query "req", request.Query "start", request.Query "end" with
+            | Some id, Some req, Some startIndex, Some endIndex ->
                 let session = logSessions.Item(id)
                 let result = session.Items.[int startIndex..int endIndex] 
+
+                let getLogItem item = 
+                    let highlightedText =
+                        match session.Restriction with 
+                        | Some restriction -> getHighlightedParts restriction.Keywords item.Text |> List.toArray
+                        | None -> null                        
+                    {
+                        HighlightedText = highlightedText 
+                        Text = item.Text
+                        Index = item.Index
+                        FileIndex = item.FileIndex
+                    }
+
                 let result = 
-                    match session.Restriction with 
-                    | Some restriction -> 
-                        result |> Array.map (fun item -> { item with HighlightedText = getHighlightedParts restriction.Keywords item.Text |> List.toArray })
-                    | None -> result
+                    {
+                        Request = int req
+                        Items = result |> Array.map getLogItem
+                    }
                 do! requestSession.AsyncSendJson (result :> obj)
                 return true
             | _ -> return false
         | "setrestrictions" ->
             match request.Query "id", request.Query "restriction" with
             | Some id, Some restriction when restriction.Length > 0 -> 
-
                 let restriction = Restriction.getRestriction restriction
-
-                let changeItem item = 
-                    match item with
-                    | Some item -> Some { item with Restriction = Some restriction }
-                    | None -> None
-
-                logSessions <- logSessions |> Map.change id changeItem
+                updateSession id (fun item -> { item with Restriction = Some restriction })
                 do! requestSession.AsyncSendJson ({||} :> obj)
                 return true
             | Some id, Some restriction when restriction.Length = 0 -> 
-                let changeItem item = 
-                    match item with
-                    | Some item -> Some { item with Restriction = None }
-                    | None -> None
-
-                logSessions <- logSessions |> Map.change id changeItem
+                updateSession id (fun item -> { item with Restriction = None })
                 do! requestSession.AsyncSendJson ({||} :> obj)
                 return true
             | _ -> return false

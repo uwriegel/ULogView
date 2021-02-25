@@ -29,8 +29,19 @@ type TextPart = {
     RestrictionIndex: RestrictionIndex
 }
 
-type LineItem = {
+type LogItem = {
     HighlightedText: TextPart[] 
+    Text: string
+    Index: int
+    FileIndex: int
+}
+
+type LogItemResult = {
+    Request: int
+    Items: LogItem[]
+}
+
+type LineItem = {
     Text: string
     Index: int
     FileIndex: int

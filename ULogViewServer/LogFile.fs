@@ -23,7 +23,7 @@ let readLog filePath isUtf8 =
         }
         
     readLines ()
-    |> Seq.mapi (fun i n -> { Text = n; Index = i; FileIndex = i; HighlightedText = null })
+    |> Seq.mapi (fun i n -> { Text = n; Index = i; FileIndex = i; })
     |> Seq.toArray
         
         
