@@ -28,6 +28,7 @@ type LogItemResult = {
 function App() {
 	const [itemSource, setItemSource] = useState({count: 0, getItems: async (s,e)=>null} as ItemsSource)
 	const [id, setId] = useState("")
+	const [restricted, setRestricted] = useState(false)
 
     const getItem = (text: string, highlightedItems?: TextPart[], index?: number) => ({ 
         item: text, 
@@ -53,8 +54,19 @@ function App() {
 		}
 	}, [])
 
-  	return (
-    	<div className="App">
+    const onKeydown = async (sevt: React.KeyboardEvent) => {
+        const evt = sevt.nativeEvent
+        if (evt.which == 114) { // F3
+			const data = await fetch(`http://localhost:9865/toggleview?id=${id}&restrict=${!restricted}`)
+			const lineItems = (await data.json() as LogItemResult)
+			evt.stopImmediatePropagation()
+			evt.preventDefault()
+			evt.stopPropagation()
+		}
+    }
+
+	return (
+    	<div className="App" onKeyDown={onKeydown}>
 			<LogView itemSource={itemSource} id={id} />
   		</div>
   	)

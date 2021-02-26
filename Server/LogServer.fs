@@ -11,6 +11,7 @@ open ULogViewServer
 type LogSession = {
     Send: (obj->unit)
     Items: LineItem[]
+    FilteredItems: LineItem[] option
     Restriction: Restriction option
 }
 
@@ -18,7 +19,7 @@ let mutable private sessionIdGenerator = 0
 let mutable logSessions = Map.empty<string, LogSession>
 
 let createSession id send =
-    logSessions <- logSessions.Add (id, { Send = send; Items = [||]; Restriction = None })
+    logSessions <- logSessions.Add (id, { Send = send; Items = [||]; Restriction = None; FilteredItems = None })
 
 let createSessionId () = string (Interlocked.Increment &sessionIdGenerator)
 
@@ -86,6 +87,8 @@ let request (requestSession: RequestSession) =
                 do! requestSession.AsyncSendJson ({||} :> obj)
                 return true
             | _ -> return false
+        | "toggleview" ->
+            return false
         | _ -> return false
     }
 

@@ -10,7 +10,7 @@
         Title="MainWindow" 
 		FocusManager.FocusedElement="{Binding ElementName=webView}"
 		Loaded="Window_Loaded">
-    <DockPanel>
+	<DockPanel>
 		<wv2:WebView2 Name="webView" Source="http://localhost:3000" NavigationCompleted="webView_NavigationCompleted" />
 	</DockPanel>
 </Window>

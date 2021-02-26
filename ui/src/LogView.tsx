@@ -64,7 +64,7 @@ export const LogView = ({id, itemSource }: LogViewProps) => {
     const itemRenderer = (item: VirtualTableItem) => [ <TextItem item={item as LogViewItem} /> ]
 
     return (
-        <div className='containerVirtualTable' onKeyDown={onKeydown}>
+        <div className='containerVirtualTable' >
             <VirtualTable 
                 columns={cols} 
                 isColumnsHidden={true}
@@ -75,7 +75,7 @@ export const LogView = ({id, itemSource }: LogViewProps) => {
                 itemRenderer={itemRenderer}
                 focused={focused}
                 onFocused={onFocused} />
-            <input type="text" onChange={onRestrictionsChanged} />
+            <input type="text" onChange={onRestrictionsChanged} onKeyDown={onKeydown} />
         </div>
     )
 }

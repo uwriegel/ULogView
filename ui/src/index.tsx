@@ -3,6 +3,13 @@ import ReactDOM from 'react-dom'
 import './index.css'
 import App from './App'
 
+window.addEventListener("keydown", (evt) => {
+	if (evt.which == 114) {
+		evt.preventDefault()
+		console.log("Das wars")
+	}
+})
+
 ReactDOM.render(
   	<React.StrictMode>
     	<App />
