@@ -44,6 +44,8 @@ let updateSession id getUpdate =
         | None -> None
     logSessions <- logSessions |> Map.change id changeItem
 
+
+
 let request (requestSession: RequestSession) =
 
     async {
@@ -52,8 +54,12 @@ let request (requestSession: RequestSession) =
         | "getitems" ->
             match request.Query "id", request.Query "req", request.Query "start", request.Query "end" with
             | Some id, Some req, Some startIndex, Some endIndex ->
-                let session = logSessions.Item(id)
-                let result = session.Items.[int startIndex..int endIndex] 
+                let session = logSessions.Item id
+                let items = 
+                    match session.FilteredItems with
+                    | Some items -> items
+                    | None -> session.Items
+                let result = items.[int startIndex..int endIndex] 
 
                 let getLogItem item = 
                     let highlightedText =
@@ -88,7 +94,29 @@ let request (requestSession: RequestSession) =
                 return true
             | _ -> return false
         | "toggleview" ->
-            return false
+            match request.Query "id" with
+            | Some id -> 
+                let session = logSessions.Item id
+                let isFolded = 
+                    match session.Restriction, session.FilteredItems with
+                    | Some _, Some filtered ->
+
+                        false
+                    | Some restriction, None ->
+                        let filter lineItem = 
+                            if restriction.Restrictions |> filterRestriction lineItem.Text then Some lineItem else None
+                        
+                        let adaptIndex index (lineItem: LineItem) = { lineItem with Index = index }
+
+                        let filteredItems = session.Items |> Array.Parallel.choose filter |> Array.mapi adaptIndex
+                        updateSession id (fun item -> { item with FilteredItems = Some filteredItems })
+                        true
+                        // TODO: new ItemsSource
+                    | None, _ ->
+                        false
+                do! requestSession.AsyncSendJson ({| IsFolded = isFolded |} :> obj)
+                return true
+            | _ -> return false
         | _ -> return false
     }
 

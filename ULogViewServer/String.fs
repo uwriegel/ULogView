@@ -29,3 +29,10 @@ module String =
         | false, false -> str.Split (seps, StringSplitOptions.RemoveEmptyEntries)
         | false, true -> [|str|]
         |_ -> [||]
+
+    let containsComparison (test: string) comparison (str: string) =
+        match isNull str, isNull test with
+        | false, false -> 
+            str.Contains(test, comparison)
+        | _ -> false
+

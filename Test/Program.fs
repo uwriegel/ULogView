@@ -5,6 +5,11 @@ open Restriction
 open System.Threading
 open System
 
+//let testRestriction = { Restrictions = Text "module"; Keywords = [] }
+//let t1 = "Das Module ist groß" |> filterRestriction testRestriction
+//let t2 = "Das Programm ist groß" |> filterRestriction testRestriction
+
+
 let test = "Hallo Info und USER und cache dsdkajdk info jakjd alk cachett"
 
 let test1 = getHighlightedPartsFromText "User" test RestrictionIndex.Restricted1

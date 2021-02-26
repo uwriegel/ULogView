@@ -57,17 +57,18 @@ function App() {
     const onKeydown = async (sevt: React.KeyboardEvent) => {
         const evt = sevt.nativeEvent
         if (evt.which == 114) { // F3
-			const data = await fetch(`http://localhost:9865/toggleview?id=${id}&restrict=${!restricted}`)
+			const data = await fetch(`http://localhost:9865/toggleview?id=${id}`)
 			const lineItems = (await data.json() as LogItemResult)
 			evt.stopImmediatePropagation()
 			evt.preventDefault()
 			evt.stopPropagation()
+			setRestricted(true)
 		}
     }
 
 	return (
     	<div className="App" onKeyDown={onKeydown}>
-			<LogView itemSource={itemSource} id={id} />
+			<LogView itemSource={itemSource} id={id} restricted={restricted}/>
   		</div>
   	)
 }

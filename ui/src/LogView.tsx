@@ -25,9 +25,10 @@ import { TextPart } from './App'
 export type LogViewProps = {
     id: string
     itemSource: ItemsSource
+    restricted: boolean
 }
 
-export const LogView = ({id, itemSource }: LogViewProps) => {
+export const LogView = ({id, itemSource, restricted }: LogViewProps) => {
     const [cols, setCols] = useState([{ name: "Eine Spalte" }] as Column[])
 
     const [focused, setFocused] = useState(false)
@@ -45,7 +46,7 @@ export const LogView = ({id, itemSource }: LogViewProps) => {
     useLayoutEffect(() => {
         refresh()
         setFocused(true)
-    }, [itemSource])
+    }, [itemSource, restricted])
 
     const onRestrictionsChanged = (evt: React.ChangeEvent<HTMLInputElement>) => {
         input.current = evt.target.value

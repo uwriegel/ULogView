@@ -72,3 +72,13 @@ let getHighlightedParts restrictionKeys text =
     getRestrictionsParts restrictionKeys [{ Text = text
                                             RestrictionIndex = RestrictionIndex.NotRestricted 
                                          }] RestrictionIndex.Restricted1
+
+let rec filterRestriction text restrictions = 
+    match restrictions with
+    | Text restriction -> 
+        text |> String.containsComparison restriction StringComparison.CurrentCultureIgnoreCase 
+    | OrRestrictions orr -> 
+        orr |> Array.exists (filterRestriction text)
+    | _ -> false
+
+// TODO AND
