@@ -25,7 +25,10 @@ namespace ULogView
 
         void webView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
             => DropFile.Initialize(this, OnDropFile);
-
-		// TODO Array.Parallel.map
 	}
 }
+// TODO: ProgressView when loading file
+// TODO ProgressView when toggleing
+// TODO When restricted: set current index on first item after current item
+// TODO When toggle: set current index
+

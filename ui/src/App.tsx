@@ -40,7 +40,7 @@ function App() {
 		const data = await fetch(`http://localhost:9865/getitems?id=${id}&req=${++requestId}&start=${start}&end=${end}`)
 		const lineItems = (await data.json() as LogItemResult)
 		return requestId == lineItems.request
-			? lineItems.items.map(n => getItem(n.text, n.highlightedText, n.fileIndex))
+			? lineItems.items.map(n => getItem(n.text, n.highlightedText, n.index))
 			: null
 	}
 	

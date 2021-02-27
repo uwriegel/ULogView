@@ -44,7 +44,13 @@ let updateSession id getUpdate =
         | None -> None
     logSessions <- logSessions |> Map.change id changeItem
 
-
+let changeItems sessionId = 
+    let session = logSessions.Item sessionId
+    let count = 
+        match session.FilteredItems with
+        | Some items -> items.Length
+        | None -> session.Items.Length
+    session.Send ({ Id = sessionId; LineCount = count } :> obj) 
 
 let request (requestSession: RequestSession) =
 
@@ -99,21 +105,19 @@ let request (requestSession: RequestSession) =
                 let session = logSessions.Item id
                 let isFolded = 
                     match session.Restriction, session.FilteredItems with
-                    | Some _, Some filtered ->
-
+                    | Some _, Some filtered -> 
+                        updateSession id (fun item -> { item with FilteredItems = None })
                         false
                     | Some restriction, None ->
                         let filter lineItem = 
                             if restriction.Restrictions |> filterRestriction lineItem.Text then Some lineItem else None
-                        
                         let adaptIndex index (lineItem: LineItem) = { lineItem with Index = index }
-
                         let filteredItems = session.Items |> Array.Parallel.choose filter |> Array.mapi adaptIndex
                         updateSession id (fun item -> { item with FilteredItems = Some filteredItems })
                         true
-                        // TODO: new ItemsSource
                     | None, _ ->
                         false
+                changeItems id
                 do! requestSession.AsyncSendJson ({| IsFolded = isFolded |} :> obj)
                 return true
             | _ -> return false
@@ -136,11 +140,13 @@ let start () = server.start ()
 let indexFile logFile =
     // TODO Send Loading...
     let lines = LogFile.readLog logFile false
-    
     logSessions <- logSessions |> Map.map (fun k item  -> { item with Items = lines })
-    logSessions |> Map.iter (fun key item -> item.Send ({ Id = key; LineCount = lines.Length } :> obj)) 
-    // TODO Send Loading finished
-
-
+    logSessions |> Map.iter (fun id _ -> changeItems id)
+    
+// TODO: ProgressView when loading file
+// TODO ProgressView when toggleing
+// TODO When restricted: set current index on first item after current item
+// TODO When toggle: set current index
+    
 
 

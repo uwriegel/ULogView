@@ -46,7 +46,7 @@ export const LogView = ({id, itemSource, restricted }: LogViewProps) => {
     useLayoutEffect(() => {
         refresh()
         setFocused(true)
-    }, [itemSource, restricted])
+    }, [itemSource])
 
     const onRestrictionsChanged = (evt: React.ChangeEvent<HTMLInputElement>) => {
         input.current = evt.target.value
