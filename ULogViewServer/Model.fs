@@ -1,6 +1,21 @@
 ﻿namespace ULogViewServer
 open System
 
+type EventType = 
+    LogFileSession = 0
+    | Progress = 1
+
+type LogFileSession = {
+    Id: string
+    LineCount: int
+    EventType: EventType
+}   
+
+type Progress = {
+    Progress: int64
+    EventType: EventType
+}
+
 type LineItemIndex = {
     Index: int
     LineIndex: int
@@ -47,7 +62,3 @@ type LineItem = {
     FileIndex: int
 }
 
-type LogFileSession = {
-    Id: string
-    LineCount: int
-}   

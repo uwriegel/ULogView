@@ -50,7 +50,7 @@ let changeItems sessionId =
         match session.FilteredItems with
         | Some items -> items.Length
         | None -> session.Items.Length
-    session.Send ({ Id = sessionId; LineCount = count } :> obj) 
+    session.Send ({ Id = sessionId; LineCount = count; EventType = EventType.LogFileSession } :> obj) 
 
 let request (requestSession: RequestSession) =
 
@@ -137,9 +137,12 @@ let private server = Server.create configuration
 
 let start () = server.start ()    
 
+let sendProgress progress = 
+    logSessions |> Map.iter (fun _ session -> session.Send ( { Progress = progress; EventType = EventType.Progress } :> obj))
+
 let indexFile logFile =
     // TODO Send Loading...
-    let lines = LogFile.readLog logFile false
+    let lines = LogFile.readLog logFile false sendProgress
     logSessions <- logSessions |> Map.map (fun k item  -> { item with Items = lines })
     logSessions |> Map.iter (fun id _ -> changeItems id)
     

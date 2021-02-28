@@ -5,9 +5,16 @@ import {Progress} from './Progress'
 
 var requestId = 0
 
+type Event = {
+
+}
+
 type LogFileItem = {
 	id: string
 	lineCount: number
+
+
+	progress: number
 }
 
 export type TextPart = {
@@ -31,7 +38,7 @@ function App() {
 	const [itemSource, setItemSource] = useState({count: 0, getItems: async (s,e)=>null} as ItemsSource)
 	const [id, setId] = useState("")
 	const [restricted, setRestricted] = useState(false)
-	const [showProgress, setShowProgress] = useState(false)
+	const [showProgress, setShowProgress] = useState(0)
 
     const getItem = (text: string, highlightedItems?: TextPart[], index?: number) => ({ 
         item: text, 
@@ -52,8 +59,15 @@ function App() {
 		ws.onclose = () => console.log("Closed")
 		ws.onmessage = p => { 
 			const logFileItem = JSON.parse(p.data) as LogFileItem
-			setId(logFileItem.id)
-			setItemSource({count: logFileItem.lineCount, getItems: (s, e) => getItems(logFileItem.id, s, e) })
+			if (logFileItem.progress)
+				if (logFileItem.progress < 100)
+					setShowProgress(logFileItem.progress)	
+				// else
+				// 	setShowProgress(0)
+			else {
+				setId(logFileItem.id)
+				setItemSource({count: logFileItem.lineCount, getItems: (s, e) => getItems(logFileItem.id, s, e) })
+			}
 		}
 	}, [])
 
@@ -73,7 +87,7 @@ function App() {
     	<div className="App" onKeyDown={onKeydown}>
 			<LogView itemSource={itemSource} id={id} restricted={restricted}/>
 			<CSSTransition
-			    in={showProgress}
+			    in={showProgress > 0}
         		timeout={300}
         		classNames="progress"
         		unmountOnExit
