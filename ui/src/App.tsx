@@ -77,8 +77,6 @@ function App() {
         		timeout={300}
         		classNames="progress"
         		unmountOnExit
-        		// onEnter={() => setShowButton(false)}
-        		// onExited={() => setShowButton(true)}
       		>			
 				<Progress />
 			</CSSTransition>
