@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { CSSTransition } from 'react-transition-group'
 import {ItemsSource, LogView, LogViewItem} from './LogView'
+import {Progress} from './Progress'
 
 var requestId = 0
 
@@ -29,6 +31,7 @@ function App() {
 	const [itemSource, setItemSource] = useState({count: 0, getItems: async (s,e)=>null} as ItemsSource)
 	const [id, setId] = useState("")
 	const [restricted, setRestricted] = useState(false)
+	const [showProgress, setShowProgress] = useState(false)
 
     const getItem = (text: string, highlightedItems?: TextPart[], index?: number) => ({ 
         item: text, 
@@ -69,6 +72,16 @@ function App() {
 	return (
     	<div className="App" onKeyDown={onKeydown}>
 			<LogView itemSource={itemSource} id={id} restricted={restricted}/>
+			<CSSTransition
+			    in={showProgress}
+        		timeout={300}
+        		classNames="progress"
+        		unmountOnExit
+        		// onEnter={() => setShowButton(false)}
+        		// onExited={() => setShowButton(true)}
+      		>			
+				<Progress />
+			</CSSTransition>
   		</div>
   	)
 }
