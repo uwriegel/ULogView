@@ -12,8 +12,7 @@ type Event = {
 type LogFileItem = {
 	id: string
 	lineCount: number
-
-
+	loading: boolean
 	progress: number
 }
 
@@ -62,7 +61,7 @@ function App() {
 			const logFileItem = JSON.parse(p.data) as LogFileItem
 			if (logFileItem.progress)
 				if (logFileItem.progress < 100) {
-					setProgressTitle("Indiziere Logdatei")
+					setProgressTitle(logFileItem.loading ? "Indiziere Logdatei" : "Wende Einschränkungen an")
 					setProgress(logFileItem.progress)	
 				}
 				else

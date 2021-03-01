@@ -5,7 +5,6 @@ open System
 open FSharpTools
 open ULogViewServer
 
-
 let getRestriction restrictionString = 
     let getAndRestriction andPart = 
         match andPart |> String.split " AND " with

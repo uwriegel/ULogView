@@ -52,6 +52,9 @@ let changeItems sessionId =
         | None -> session.Items.Length
     session.Send ({ Id = sessionId; LineCount = count; EventType = EventType.LogFileSession } :> obj) 
 
+let sendProgress isLoading progress = 
+    logSessions |> Map.iter (fun _ session -> session.Send ( { Progress = progress; EventType = EventType.Progress; Loading = isLoading } :> obj))
+
 let request (requestSession: RequestSession) =
 
     async {
@@ -103,17 +106,32 @@ let request (requestSession: RequestSession) =
             match request.Query "id" with
             | Some id -> 
                 let session = logSessions.Item id
+                let mutable progressState = 0
                 let isFolded = 
                     match session.Restriction, session.FilteredItems with
                     | Some _, Some filtered -> 
                         updateSession id (fun item -> { item with FilteredItems = None })
                         false
                     | Some restriction, None ->
+                        let sendProgress = sendProgress false
+                        let startTimer () = 
+                            let progressSender _ = 
+                                let newProgress = int64 (double progressState / double session.Items.Length * 100.0)
+                                sendProgress newProgress
+                            let timer = new System.Timers.Timer (float 200.0)
+                            timer.Elapsed.Add progressSender 
+                            timer.Start ()
+                            let dispose () = timer.Stop ()
+                            { new System.IDisposable with member this.Dispose() = dispose () }
+
+                        use timer = startTimer ()
                         let filter lineItem = 
+                            Interlocked.Increment &progressState |> ignore
                             if restriction.Restrictions |> filterRestriction lineItem.Text then Some lineItem else None
                         let adaptIndex index (lineItem: LineItem) = { lineItem with Index = index }
                         let filteredItems = session.Items |> Array.Parallel.choose filter |> Array.mapi adaptIndex
                         updateSession id (fun item -> { item with FilteredItems = Some filteredItems })
+                        sendProgress 100L
                         true
                     | None, _ ->
                         false
@@ -137,17 +155,12 @@ let private server = Server.create configuration
 
 let start () = server.start ()    
 
-let sendProgress progress = 
-    logSessions |> Map.iter (fun _ session -> session.Send ( { Progress = progress; EventType = EventType.Progress } :> obj))
-
 let indexFile logFile =
-    // TODO Send Loading...
-    let lines = LogFile.readLog logFile false sendProgress
+    let sendProgress = sendProgress true
+    let lines = LogFile.readLog logFile false sendProgress 
     logSessions <- logSessions |> Map.map (fun k item  -> { item with Items = lines })
     logSessions |> Map.iter (fun id _ -> changeItems id)
     
-// TODO: ProgressView when loading file
-// TODO ProgressView when toggleing
 // TODO When restricted: set current index on first item after current item
 // TODO When toggle: set current index
     

@@ -13,6 +13,7 @@ type LogFileSession = {
 
 type Progress = {
     Progress: int64
+    Loading: bool
     EventType: EventType
 }
 
