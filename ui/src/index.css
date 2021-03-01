@@ -79,8 +79,18 @@ table tr .textitem {
 .progressControl {
 	background-color: rgba(0, 0, 0, 0.300);	
 	position: absolute;
+	display: flex;
 	width: 100%;
 	height: 100%;
+}
+
+.progressControl>div {
+	display: flex;
+    width: 200px;
+    height: 150px;
+    margin: auto auto;
+    background-color: white;
+	box-shadow: 5px 4px 8px 2px rgba(0, 0, 0, 0.35), 0px 0px 20px 2px rgba(0, 0, 0, 0.25);	
 }
 
 .progress-enter {
@@ -98,14 +108,7 @@ table tr .textitem {
 	transition: opacity 300ms;
 }
   
-.svg {
-    width: 16px;
-    height: 16px;
-    transform: rotate(-90deg);
-    border-radius: 50%;
-}
 .progressCircle {
-    fill: transparent;
-    stroke: white;
-    stroke-width: 32;
+	width: 100px;
+    margin: 0 auto;	
 }

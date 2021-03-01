@@ -62,8 +62,8 @@ function App() {
 			if (logFileItem.progress)
 				if (logFileItem.progress < 100)
 					setShowProgress(logFileItem.progress)	
-				// else
-				// 	setShowProgress(0)
+				else
+				 	setShowProgress(0)
 			else {
 				setId(logFileItem.id)
 				setItemSource({count: logFileItem.lineCount, getItems: (s, e) => getItems(logFileItem.id, s, e) })
@@ -90,9 +90,8 @@ function App() {
 			    in={showProgress > 0}
         		timeout={300}
         		classNames="progress"
-        		unmountOnExit
-      		>			
-				<Progress />
+        		unmountOnExit >			
+				<Progress progress={showProgress} />
 			</CSSTransition>
   		</div>
   	)
