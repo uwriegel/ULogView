@@ -2,13 +2,15 @@ import React from 'react'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 
 export type ProgressProps = {
+    title: string
     progress: number
 }
 
-export const Progress = ({progress}: ProgressProps) => {
+export const Progress = ({progress, title}: ProgressProps) => {
     return (
         <div className='progressControl'>
             <div>
+                <h3>{title}...</h3>
                 <CircularProgressbar className={"progressCircle"} value={progress}
                     styles={buildStyles({
                         // Rotation of path and trail, in number of turns (0-1)

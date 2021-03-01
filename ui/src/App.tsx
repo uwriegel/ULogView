@@ -38,7 +38,8 @@ function App() {
 	const [itemSource, setItemSource] = useState({count: 0, getItems: async (s,e)=>null} as ItemsSource)
 	const [id, setId] = useState("")
 	const [restricted, setRestricted] = useState(false)
-	const [showProgress, setShowProgress] = useState(0)
+	const [progress, setProgress] = useState(0)
+	const [progressTitle, setProgressTitle] = useState("")
 
     const getItem = (text: string, highlightedItems?: TextPart[], index?: number) => ({ 
         item: text, 
@@ -60,10 +61,12 @@ function App() {
 		ws.onmessage = p => { 
 			const logFileItem = JSON.parse(p.data) as LogFileItem
 			if (logFileItem.progress)
-				if (logFileItem.progress < 100)
-					setShowProgress(logFileItem.progress)	
+				if (logFileItem.progress < 100) {
+					setProgressTitle("Indiziere Logdatei")
+					setProgress(logFileItem.progress)	
+				}
 				else
-				 	setShowProgress(0)
+				  	setProgress(0)
 			else {
 				setId(logFileItem.id)
 				setItemSource({count: logFileItem.lineCount, getItems: (s, e) => getItems(logFileItem.id, s, e) })
@@ -87,11 +90,11 @@ function App() {
     	<div className="App" onKeyDown={onKeydown}>
 			<LogView itemSource={itemSource} id={id} restricted={restricted}/>
 			<CSSTransition
-			    in={showProgress > 0}
+			    in={progress > 0}
         		timeout={300}
         		classNames="progress"
         		unmountOnExit >			
-				<Progress progress={showProgress} />
+				<Progress progress={progress} title={progressTitle} />
 			</CSSTransition>
   		</div>
   	)

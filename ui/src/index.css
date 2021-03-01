@@ -86,11 +86,14 @@ table tr .textitem {
 
 .progressControl>div {
 	display: flex;
-    width: 200px;
-    height: 150px;
+	flex-direction: column;
+    padding: 30px;
     margin: auto auto;
     background-color: white;
 	box-shadow: 5px 4px 8px 2px rgba(0, 0, 0, 0.35), 0px 0px 20px 2px rgba(0, 0, 0, 0.25);	
+}
+.progressControl>div>h3 {
+	color: gray;
 }
 
 .progress-enter {
