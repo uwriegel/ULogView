@@ -12,6 +12,7 @@ type Event = {
 type LogFileItem = {
 	id: string
 	lineCount: number
+	indexToSelect: number
 	loading: boolean
 	progress: number
 }
@@ -28,29 +29,29 @@ type LogItem = {
     fileIndex: number
 }
 
-type LogItemResult = {
+export type LogItemResult = {
 	request: number
 	items: LogItem[]
 }
 
 function App() {
-	const [itemSource, setItemSource] = useState({count: 0, getItems: async (s,e)=>null} as ItemsSource)
+	const [itemSource, setItemSource] = useState({count: 0, indexToSelect:0, getItems: async (s,e)=>null} as ItemsSource)
 	const [id, setId] = useState("")
-	const [restricted, setRestricted] = useState(false)
 	const [progress, setProgress] = useState(0)
 	const [progressTitle, setProgressTitle] = useState("")
 
-    const getItem = (text: string, highlightedItems?: TextPart[], index?: number) => ({ 
+    const getItem = (text: string, highlightedItems?: TextPart[], index?: number, fileIndex?: number) => ({ 
         item: text, 
 		highlightedItems,
-        index: index || 0 
+        index: index || 0,
+		fileIndex: fileIndex || 0
     } as LogViewItem)
 
     const getItems = async (id: string, start: number, end: number) => {
 		const data = await fetch(`http://localhost:9865/getitems?id=${id}&req=${++requestId}&start=${start}&end=${end}`)
 		const lineItems = (await data.json() as LogItemResult)
 		return requestId == lineItems.request
-			? lineItems.items.map(n => getItem(n.text, n.highlightedText, n.index))
+			? lineItems.items.map(n => getItem(n.text, n.highlightedText, n.index, n.fileIndex))
 			: null
 	}
 	
@@ -68,26 +69,14 @@ function App() {
 				  	setProgress(0)
 			else {
 				setId(logFileItem.id)
-				setItemSource({count: logFileItem.lineCount, getItems: (s, e) => getItems(logFileItem.id, s, e) })
+				setItemSource({count: logFileItem.lineCount, getItems: (s, e) => getItems(logFileItem.id, s, e), indexToSelect: logFileItem.indexToSelect})
 			}
 		}
 	}, [])
 
-    const onKeydown = async (sevt: React.KeyboardEvent) => {
-        const evt = sevt.nativeEvent
-        if (evt.which == 114) { // F3
-			const data = await fetch(`http://localhost:9865/toggleview?id=${id}`)
-			const lineItems = (await data.json() as LogItemResult)
-			evt.stopImmediatePropagation()
-			evt.preventDefault()
-			evt.stopPropagation()
-			setRestricted(true)
-		}
-    }
-
 	return (
-    	<div className="App" onKeyDown={onKeydown}>
-			<LogView itemSource={itemSource} id={id} restricted={restricted}/>
+    	<div className="App" >
+			<LogView itemSource={itemSource} id={id} />
 			<CSSTransition
 			    in={progress > 0}
         		timeout={300}

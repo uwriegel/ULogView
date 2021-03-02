@@ -3,11 +3,14 @@ import 'virtual-table-react/dist/index.css'
 
 export interface LogViewItem extends VirtualTableItem {
     item: string,
+    index: number,
+    fileIndex: number,
     highlightedItems?: TextPart[] 
 }
 
 export type ItemsSource = {
     count: number
+    indexToSelect: number
     getItems: (start: number, end: number)=>Promise<LogViewItem[]|null>
 }
 
@@ -20,15 +23,14 @@ import {
 } from 'virtual-table-react'
 
 import { TextItem } from './TextItem'
-import { TextPart } from './App'
+import { LogItemResult, TextPart } from './App'
 
 export type LogViewProps = {
     id: string
     itemSource: ItemsSource
-    restricted: boolean
 }
 
-export const LogView = ({id, itemSource, restricted }: LogViewProps) => {
+export const LogView = ({id, itemSource }: LogViewProps) => {
     const [cols, setCols] = useState([{ name: "Eine Spalte" }] as Column[])
 
     const [focused, setFocused] = useState(false)
@@ -41,10 +43,10 @@ export const LogView = ({id, itemSource, restricted }: LogViewProps) => {
 
     const onFocused = (val: boolean) => setFocused(val)
 
-    const refresh = () => setItems(setVirtualTableItems({count: itemSource.count, getItems: itemSource.getItems, currentIndex: items.currentIndex }))
+    const refresh = (indexToSelect: number | null) => setItems(setVirtualTableItems({count: itemSource.count, getItems: itemSource.getItems, currentIndex: indexToSelect || items.currentIndex }))
 
     useLayoutEffect(() => {
-        refresh()
+        refresh(itemSource.indexToSelect)
         setFocused(true)
     }, [itemSource])
 
@@ -57,15 +59,31 @@ export const LogView = ({id, itemSource, restricted }: LogViewProps) => {
         if (evt.which == 13) { // Enter
             const data = await fetch(`http://localhost:9865/setrestrictions?id=${id}&restriction=${input.current}`)
             await data.json()
-            refresh()
+            refresh(0)
             setFocused(true)
         }
+    }
+
+    const onTableKeydown = async (sevt: React.KeyboardEvent) => {
+        const evt = sevt.nativeEvent
+        if (evt.which == 114) { // F3
+
+            // TODO do this in F# when sending new itensSource per websocket
+            const currentItem = await itemSource.getItems(items.currentIndex || 0, items.currentIndex || 0)
+            const indexToSelect = currentItem && currentItem[0].fileIndex != currentItem[0].index ? currentItem[0].fileIndex : 0
+
+			const data = await fetch(`http://localhost:9865/toggleview?id=${id}&indexToSelect=${indexToSelect}`)
+			const lineItems = (await data.json() as LogItemResult)
+			evt.stopImmediatePropagation()
+			evt.preventDefault()
+			evt.stopPropagation()
+		}
     }
 
     const itemRenderer = (item: VirtualTableItem) => [ <TextItem item={item as LogViewItem} /> ]
 
     return (
-        <div className='containerVirtualTable' >
+        <div className='containerVirtualTable' onKeyDown={onTableKeydown}>
             <VirtualTable 
                 columns={cols} 
                 isColumnsHidden={true}

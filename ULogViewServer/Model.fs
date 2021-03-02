@@ -8,6 +8,7 @@ type EventType =
 type LogFileSession = {
     Id: string
     LineCount: int
+    IndexToSelect: int
     EventType: EventType
 }   
 

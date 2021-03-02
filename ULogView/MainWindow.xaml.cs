@@ -28,6 +28,7 @@ namespace ULogView
 	}
 }
 
-// TODO When restricted: set current index on first item after current item
 // TODO When toggle: set current index
+// TODO AND Restriction
+// TODO Cancel Restriction toggle
 
