@@ -107,14 +107,14 @@ let request (requestSession: RequestSession) =
             | Some id -> 
                 let session = logSessions.Item id
                 let mutable progressState = 0
+                let indexToSelect = 
+                    match request.Query "indexToSelect" with
+                    | Some value -> int value
+                    | None -> 0
                 let isFolded, indexToSelect = 
                     match session.Restriction, session.FilteredItems with
                     | Some _, Some filtered -> 
                         updateSession id (fun item -> { item with FilteredItems = None })
-                        let indexToSelect = 
-                            match request.Query "indexToSelect" with
-                            | Some value -> int value
-                            | None -> 0
                         false, indexToSelect
                     | Some restriction, None ->
                         let sendProgress = sendProgress false
@@ -136,7 +136,10 @@ let request (requestSession: RequestSession) =
                         let filteredItems = session.Items |> Array.Parallel.choose filter |> Array.mapi adaptIndex
                         updateSession id (fun item -> { item with FilteredItems = Some filteredItems })
                         sendProgress 100L
-                        true, 0
+                        let indexToSelect = filteredItems |> findFileIndex indexToSelect
+
+                        let test = filteredItems.[indexToSelect]
+                        true, indexToSelect
                     | None, _ ->
                         false, 0
                 changeItems id indexToSelect

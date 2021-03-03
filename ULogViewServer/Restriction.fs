@@ -80,4 +80,33 @@ let rec filterRestriction text restrictions =
         orr |> Array.exists (filterRestriction text)
     | _ -> false
 
+let findFileIndex searchIndex (restrictedItems: LineItem[]) =
+
+    let rec findFileIndex startIndex endIndex =
+        let testIndex = (startIndex + endIndex) / 2
+        let item = restrictedItems.[testIndex]
+        match item with 
+        | item when searchIndex <= restrictedItems.[startIndex].FileIndex
+            -> restrictedItems.[startIndex].Index
+        | item when searchIndex >= restrictedItems.[endIndex-1].FileIndex
+            -> restrictedItems.[endIndex-1].Index
+        | item when searchIndex = item.FileIndex
+            -> item.Index
+        | item when searchIndex < item.FileIndex
+            -> 
+                if endIndex - startIndex < 2 then
+                    item.Index
+                else
+                    findFileIndex startIndex testIndex
+        | item when searchIndex > restrictedItems.[testIndex].FileIndex
+            -> 
+                if endIndex - startIndex < 2 then
+                    item.Index
+                else
+                    findFileIndex testIndex endIndex
+        | _ -> item.Index
+    
+    findFileIndex 0 restrictedItems.Length
+
+
 // TODO AND

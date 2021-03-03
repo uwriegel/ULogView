@@ -70,7 +70,7 @@ export const LogView = ({id, itemSource }: LogViewProps) => {
 
             // TODO do this in F# when sending new itensSource per websocket
             const currentItem = await itemSource.getItems(items.currentIndex || 0, items.currentIndex || 0)
-            const indexToSelect = currentItem && currentItem[0].fileIndex != currentItem[0].index ? currentItem[0].fileIndex : 0
+            const indexToSelect = currentItem && currentItem[0].fileIndex
 
 			const data = await fetch(`http://localhost:9865/toggleview?id=${id}&indexToSelect=${indexToSelect}`)
 			const lineItems = (await data.json() as LogItemResult)
