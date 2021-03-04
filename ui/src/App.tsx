@@ -35,7 +35,7 @@ export type LogItemResult = {
 }
 
 function App() {
-	const [itemSource, setItemSource] = useState({count: 0, indexToSelect:0, getItems: async (s,e)=>null} as ItemsSource)
+	const [itemSource, setItemSource] = useState({count: 0, indexToSelect:0, getItems: async (s,e)=>[]} as ItemsSource)
 	const [id, setId] = useState("")
 	const [progress, setProgress] = useState(0)
 	const [progressTitle, setProgressTitle] = useState("")
@@ -52,7 +52,7 @@ function App() {
 		const lineItems = (await data.json() as LogItemResult)
 		return requestId == lineItems.request
 			? lineItems.items.map(n => getItem(n.text, n.highlightedText, n.index, n.fileIndex))
-			: null
+			: []
 	}
 	
 	useEffect(() => {

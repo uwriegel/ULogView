@@ -28,8 +28,6 @@ namespace ULogView
 	}
 }
 
-// TODO When toggle: fileIndex 0 not changing index
-// TODO When toggle: ScrollIntoView
 // TODO AND Restriction
 // TODO Cancel Restriction toggle
 

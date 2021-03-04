@@ -11,7 +11,7 @@ export interface LogViewItem extends VirtualTableItem {
 export type ItemsSource = {
     count: number
     indexToSelect: number
-    getItems: (start: number, end: number)=>Promise<LogViewItem[]|null>
+    getItems: (start: number, end: number)=>Promise<LogViewItem[]>
 }
 
 import { 
@@ -43,7 +43,7 @@ export const LogView = ({id, itemSource }: LogViewProps) => {
 
     const onFocused = (val: boolean) => setFocused(val)
 
-    const refresh = (indexToSelect: number | null) => setItems(setVirtualTableItems({count: itemSource.count, getItems: itemSource.getItems, currentIndex: indexToSelect || items.currentIndex }))
+    const refresh = (indexToSelect: number | null) => setItems(setVirtualTableItems({count: itemSource.count, getItems: itemSource.getItems, currentIndex: indexToSelect || 0 }))
 
     useLayoutEffect(() => {
         refresh(itemSource.indexToSelect)
@@ -59,7 +59,7 @@ export const LogView = ({id, itemSource }: LogViewProps) => {
         if (evt.which == 13) { // Enter
             const data = await fetch(`http://localhost:9865/setrestrictions?id=${id}&restriction=${input.current}`)
             await data.json()
-            refresh(0)
+            refresh(items.currentIndex || 0)
             setFocused(true)
         }
     }
