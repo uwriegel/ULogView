@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="UwebSocket" Version="5.0.0" />
+    <PackageReference Include="UwebStatic" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>

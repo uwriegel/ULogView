@@ -149,6 +149,10 @@ let request (requestSession: RequestSession) =
         | _ -> return false
     }
 
+
+let currentDirectory = DirectoryInfo (Directory.GetCurrentDirectory ())
+let ui = Static.useStatic currentDirectory.Parent.FullName "/" 
+
 let private configuration = Configuration.create {
     Configuration.createEmpty() with 
         Port = 9865
@@ -156,6 +160,7 @@ let private configuration = Configuration.create {
         Requests = [ 
             Websocket.useWebsocket "/websocketurl" onSocketSession
             request
+            ui
         ]
 }
 let private server = Server.create configuration 

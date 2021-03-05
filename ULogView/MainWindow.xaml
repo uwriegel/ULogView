@@ -11,6 +11,6 @@
 		FocusManager.FocusedElement="{Binding ElementName=webView}"
 		Loaded="Window_Loaded">
 	<DockPanel>
-		<wv2:WebView2 Name="webView" Source="http://localhost:3000" NavigationCompleted="webView_NavigationCompleted" />
+		<wv2:WebView2 Name="webView" Source="{Binding Url, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" NavigationCompleted="webView_NavigationCompleted" />
 	</DockPanel>
 </Window>

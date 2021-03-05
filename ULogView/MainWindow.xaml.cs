@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 
 using Microsoft.Web.WebView2.Core;
@@ -7,6 +8,11 @@ namespace ULogView
 {
     public partial class MainWindow : Window
     {
+#if DEBUG
+        public static Uri Url { get; } = new Uri("http://localhost:9865/");
+#else
+        public static Uri Url { get; } = new Uri("http://localhost:3000/");
+#endif
         public MainWindow() 
         {
             InitializeComponent();
