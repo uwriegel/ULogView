@@ -34,6 +34,8 @@ namespace ULogView
 	}
 }
 
+// TODO Langsames Scrollen im Release-Mode mit Static
+// Anzahl der Einträge im Wasserzeichen des Edit-Controls
 // TODO AND Restriction
 // TODO Cancel Restriction toggle
 
