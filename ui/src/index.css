@@ -115,3 +115,15 @@ table tr .textitem {
 	width: 100px;
     margin: 0 auto;	
 }
+
+.statusBar {
+	display: flex;
+}
+
+.statusBar > input {
+	flex-grow: 1;
+}
+
+.statusBar > div {
+	margin: 2px 5px;
+}

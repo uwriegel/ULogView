@@ -35,6 +35,7 @@ export const LogView = ({id, itemSource }: LogViewProps) => {
 
     const [focused, setFocused] = useState(false)
     const [items, setItems ] = useState(setVirtualTableItems({count: 0, getItems: async (s, e) =>[]}) as VirtualTableItems)
+    const [status, setStatus] = useState("")
 
     const input = useRef("")
         
@@ -47,6 +48,7 @@ export const LogView = ({id, itemSource }: LogViewProps) => {
 
     useLayoutEffect(() => {
         refresh(itemSource.indexToSelect)
+        setStatus(itemSource.count ? `${itemSource.count} Eintr.` : "")
         setFocused(true)
     }, [itemSource])
 
@@ -94,7 +96,10 @@ export const LogView = ({id, itemSource }: LogViewProps) => {
                 itemRenderer={itemRenderer}
                 focused={focused}
                 onFocused={onFocused} />
-            <input type="text" onChange={onRestrictionsChanged} onKeyDown={onKeydown} />
+            <div className={'statusBar'}>
+                <input type="text" onChange={onRestrictionsChanged} onKeyDown={onKeydown} />
+                <div>{status}</div>
+            </div>
         </div>
     )
 }
